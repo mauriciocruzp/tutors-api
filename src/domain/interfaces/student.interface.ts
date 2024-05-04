@@ -11,6 +11,8 @@ export interface StudentInterface {
     createStudent(student: StudentEntity): Promise<StudentEntity | null>;
     createTutor(tutor: TutorEntity): Promise<TutorEntity | null>;
     createSubject(subject: SubjectEntity): Promise<SubjectEntity | null>;
-    addStudenttoTutor(studentId: string, tutorId: string): Promise<StudentEntity | null>;
-    addSubjecttoStudent(studentId: string, subjectId: string): Promise<SubjectStudentEntity | null>;
+    addStudentToTutor(studentId: string, tutorId: string): Promise<StudentEntity[] | null>;
+    addSubjectToStudent(studentId: string, subjectId: string): Promise<SubjectEntity[] | null>;
+    getTutorById(id: string): Promise<TutorEntity | null>;
+    getStudentById(id: string): Promise<StudentEntity | null>;
 }
