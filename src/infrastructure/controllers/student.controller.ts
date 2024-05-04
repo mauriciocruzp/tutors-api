@@ -8,50 +8,19 @@ import { AddStudentToTutorUseCase } from "../../application/use-cases/add-studen
 import { AddSubjectToStudentUseCase } from "../../application/use-cases/add-subject-to-student.use-case";
 import { GetStudentsFromTutorUseCase } from "../../application/use-cases/get-students-from-tutor.use-case";
 import { GetSubjectsFromStudentUseCase } from "../../application/use-cases/get-subjects-from-student.use-case";
+import { GetStudentByIdUseCase } from "../../application/use-cases/get-student-by-id.use-case";
+import { GetTutorByIdUseCase } from "../../application/use-cases/get-tutor-by-id.use-case";
 
 export class StudentController {
-    constructor(readonly getStudentsFromTutorUseCase: GetStudentsFromTutorUseCase, readonly getSubjectsFromStudentUseCase: GetSubjectsFromStudentUseCase, readonly addStudentToTutorUseCase: AddStudentToTutorUseCase, readonly addSubjectToStudentUseCase: AddSubjectToStudentUseCase, readonly createSubjectUseCase: CreateSubjectUseCase, readonly createStudentUseCase: CreateStudentUseCase, readonly createTutorUseCase: CreateTutorUseCase, readonly getTutorsUseCase: GetTutorsUseCase, readonly getStudentsUseCase: GetStudentsUseCase) { }
+    constructor(readonly getTutorByIdUseCase: GetTutorByIdUseCase, readonly getStudentByIdUseCase: GetStudentByIdUseCase, readonly getStudentsFromTutorUseCase: GetStudentsFromTutorUseCase, readonly getSubjectsFromStudentUseCase: GetSubjectsFromStudentUseCase, readonly addStudentToTutorUseCase: AddStudentToTutorUseCase, readonly addSubjectToStudentUseCase: AddSubjectToStudentUseCase, readonly createSubjectUseCase: CreateSubjectUseCase, readonly createStudentUseCase: CreateStudentUseCase, readonly createTutorUseCase: CreateTutorUseCase, readonly getTutorsUseCase: GetTutorsUseCase, readonly getStudentsUseCase: GetStudentsUseCase) { }
 
-    async getStudentsFromTutor(req: Request, res: Response) {
-        const tutorId = req.params.id;
-        const students = await this.getStudentsFromTutorUseCase.execute(tutorId);
+    async getTutors(req: Request, res: Response) {
+        const tutors = await this.getTutorsUseCase.execute();
 
-        if (!students) {
-            return res.status(404).json({ message: "Students not found" });
+        if (!tutors) {
+            return res.status(404).json({ message: "Tutors not found" });
         }
-        return res.status(200).json({ students });
-    }
-
-    async getSubjectsFromStudent(req: Request, res: Response) {
-        const studentId = req.params.id;
-        const subjects = await this.getSubjectsFromStudentUseCase.execute(studentId);
-
-        if (!subjects) {
-            return res.status(404).json({ message: "Subjects not found" });
-        }
-        return res.status(200).json({ subjects });
-    }
-
-    async addStudentToTutor(req: Request, res: Response) {
-        const tutorId = req.params.id;
-        const { studentId } = req.body;
-        const student = await this.addStudentToTutorUseCase.execute(studentId, tutorId);
-
-        if (!student) {
-            return res.status(400).json({ message: "Failed to add student to tutor" });
-        }
-        return res.status(201).json({ message: "Student added to tutor successfully!", student });
-    }
-
-    async addSubjectToStudent(req: Request, res: Response) {
-        const studentId = req.params.id;
-        const { subjectId } = req.body;
-        const subjectStudent = await this.addSubjectToStudentUseCase.execute(studentId, subjectId);
-
-        if (!subjectStudent) {
-            return res.status(400).json({ message: "Failed to add subject to student" });
-        }
-        return res.status(201).json({ message: "Subject added to student successfully!", subjectStudent });
+        return res.status(200).json({ tutors });
     }
 
     async getStudents(req: Request, res: Response) {
@@ -63,33 +32,38 @@ export class StudentController {
         return res.status(200).json({ students });
     }
 
-    async getTutors(req: Request, res: Response) {
-        const tutors = await this.getTutorsUseCase.execute();
+    async getStudentsFromTutor(req: Request, res: Response) {
+        const tutorId = req.params.id;
+        const students = await this.getStudentsFromTutorUseCase.execute(tutorId);
 
-        if (!tutors) {
-            return res.status(404).json({ message: "Tutors not found" });
+        if (!students) {
+            return res.status(404).json({ message: "Students not found" });
         }
-        return res.status(200).json({ tutors });
-    }
 
-    async createStudent(req: Request, res: Response) {
-        const { firstName, lastName } = req.body;
-        const student = await this.createStudentUseCase.execute(firstName, lastName);
-
-        if (!student) {
-            return res.status(400).json({ message: "Failed to create student" });
-        }
-        return res.status(201).json({ message: "Student created successfully!", student });
-    }
-
-    async createTutor(req: Request, res: Response) {
-        const { firstName, lastName } = req.body;
-        const tutor = await this.createTutorUseCase.execute(firstName, lastName);
+        const tutor = await this.getTutorByIdUseCase.execute(tutorId);
 
         if (!tutor) {
-            return res.status(400).json({ message: "Failed to create tutor" });
+            return res.status(404).json({ message: "Tutor not found" });
         }
-        return res.status(201).json({ message: "Tutor created successfully!", tutor });
+
+        return res.status(200).json({ tutor, students });
+    }
+
+    async getSubjectsFromStudent(req: Request, res: Response) {
+        const studentId = req.params.id;
+        const subjects = await this.getSubjectsFromStudentUseCase.execute(studentId);
+
+        if (!subjects) {
+            return res.status(404).json({ message: "Subjects not found" });
+        }
+
+        const student = await this.getStudentByIdUseCase.execute(studentId);
+
+        if (!student) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+
+        return res.status(200).json({ student, subjects });
     }
 
     async createSubject(req: Request, res: Response) {
@@ -99,6 +73,62 @@ export class StudentController {
         if (!subject) {
             return res.status(400).json({ message: "Failed to create subject" });
         }
-        return res.status(201).json({ message: "Subject created successfully!", subject });
+        return res.status(201).json({ subject });
+    }
+
+    async createStudent(req: Request, res: Response) {
+        const { firstName, lastName } = req.body;
+        const student = await this.createStudentUseCase.execute(firstName, lastName);
+
+        if (!student) {
+            return res.status(400).json({ message: "Failed to create student" });
+        }
+        return res.status(201).json({ student });
+    }
+
+    async createTutor(req: Request, res: Response) {
+        const { firstName, lastName } = req.body;
+        const tutor = await this.createTutorUseCase.execute(firstName, lastName);
+
+        if (!tutor) {
+            return res.status(400).json({ message: "Failed to create tutor" });
+        }
+        return res.status(201).json({ tutor });
+    }
+
+    async addStudentToTutor(req: Request, res: Response) {
+        const tutorId = req.params.tutor_id;
+        const studentId = req.params.student_id;
+        const student = await this.addStudentToTutorUseCase.execute(studentId, tutorId);
+
+        if (!student) {
+            return res.status(400).json({ message: "Failed to add student to tutor" });
+        }
+
+        const tutor = await this.getTutorByIdUseCase.execute(tutorId);
+
+        if (!tutor) {
+            return res.status(404).json({ message: "Tutor not found" });
+        }
+
+        return res.status(201).json({ tutor, student });
+    }
+
+    async addSubjectToStudent(req: Request, res: Response) {
+        const studentId = req.params.student_id;
+        const subjectId = req.params.subject_id;
+        const subjects = await this.addSubjectToStudentUseCase.execute(studentId, subjectId);
+
+        if (!subjects) {
+            return res.status(400).json({ message: "Failed to add subject to student" });
+        }
+
+        const student = await this.getStudentByIdUseCase.execute(studentId);
+
+        if (!student) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+
+        return res.status(201).json({ student, subjects });
     }
 }
