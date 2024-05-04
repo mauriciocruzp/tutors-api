@@ -1,11 +1,7 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
-
-export interface StudentAttributes {
-    id: string;
-    firstName: string;
-    lastName: string;
-    tutorId: string;
-}
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import TutorModel from "./tutor.model";
+import SubjectModel from "./subject.model";
+import SubjectStudentModel from "./subject-student.model";
 
 @Table({
     tableName: 'students',
@@ -13,7 +9,7 @@ export interface StudentAttributes {
     timestamps: false,
 })
 
-export default class StudentModel extends Model implements StudentAttributes {
+export default class StudentModel extends Model {
     @Column({
         primaryKey: true,
         type: DataType.STRING,
@@ -32,9 +28,13 @@ export default class StudentModel extends Model implements StudentAttributes {
     })
     declare lastName: string;
 
-    @Column({
-        allowNull: true,
-        type: DataType.STRING,
-    })
+    @ForeignKey(() => TutorModel)
+    @Column
     declare tutorId: string;
+
+    @BelongsTo(() => TutorModel)
+    declare tutor: TutorModel;
+
+    @BelongsToMany(() => SubjectModel, () => SubjectStudentModel)
+    declare subjects: SubjectModel[];
 }

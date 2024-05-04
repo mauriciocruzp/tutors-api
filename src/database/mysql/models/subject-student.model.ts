@@ -1,30 +1,30 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
-
-export interface SubjectStudentAttributes {
-    id: string;
-    subjectId: string;
-    studentId: string;
-}
+import { Column, DataType, ForeignKey, Model, Sequelize, Table } from "sequelize-typescript";
+import SubjectModel from "./subject.model";
+import StudentModel from "./student.model";
 
 @Table({
-    tableName: 'subject_student',
+    tableName: 'subject-students',
     modelName: 'SubjectStudent',
     timestamps: false,
 })
 
-export default class SubjectStudentModel extends Model implements SubjectStudentAttributes {
+export default class SubjectStudentModel extends Model {
     @Column({
+        allowNull: false,
         primaryKey: true,
-        type: DataType.STRING,
+        type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
     })
     declare id: string;
 
+    @ForeignKey(() => SubjectModel)
     @Column({
         allowNull: false,
         type: DataType.STRING,
     })
     declare subjectId: string;
 
+    @ForeignKey(() => StudentModel)
     @Column({
         allowNull: false,
         type: DataType.STRING,

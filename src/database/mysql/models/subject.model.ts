@@ -1,9 +1,6 @@
-import { Table, Model, Column, DataType } from "sequelize-typescript";
-
-export interface SubjectAttributes {
-    id: string;
-    name: string;
-}
+import { Table, Model, Column, DataType, BelongsTo, BelongsToMany } from "sequelize-typescript";
+import SubjectStudentModel from "./subject-student.model";
+import StudentModel from "./student.model";
 
 @Table({
     tableName: 'subjects',
@@ -11,7 +8,7 @@ export interface SubjectAttributes {
     timestamps: false,
 })
 
-export default class SubjectModel extends Model implements SubjectAttributes {
+export default class SubjectModel extends Model {
     @Column({
         primaryKey: true,
         type: DataType.STRING,
@@ -24,4 +21,7 @@ export default class SubjectModel extends Model implements SubjectAttributes {
         type: DataType.STRING,
     })
     declare name: string;
+
+    @BelongsToMany(() => StudentModel, () => SubjectStudentModel)
+    declare students: StudentModel[];
 }

@@ -1,10 +1,5 @@
-import { Table, Model, Column, DataType } from "sequelize-typescript";
-
-export interface TutorAttributes {
-    id: string;
-    firstName: string;
-    lastName: string;
-}
+import { Table, Model, Column, DataType, HasMany } from "sequelize-typescript";
+import StudentModel from "./student.model";
 
 @Table({
     tableName: 'tutors',
@@ -12,7 +7,7 @@ export interface TutorAttributes {
     timestamps: false,
 })
 
-export default class TutorModel extends Model implements TutorAttributes {
+export default class TutorModel extends Model {
     @Column({
         primaryKey: true,
         type: DataType.STRING,
@@ -31,4 +26,7 @@ export default class TutorModel extends Model implements TutorAttributes {
         type: DataType.STRING,
     })
     declare lastName: string;
+
+    @HasMany(() => StudentModel)
+    declare students: StudentModel[];
 }
