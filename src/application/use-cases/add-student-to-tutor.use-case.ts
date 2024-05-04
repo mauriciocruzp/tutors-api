@@ -5,13 +5,13 @@ import { StudentInterface } from "../../domain/interfaces/student.interface";
 export class AddStudentToTutorUseCase {
     constructor(readonly repository: StudentInterface) { }
 
-    async execute(studentId: string, tutorId: string): Promise<StudentEntity | null> {
-        const student = await this.repository.addStudenttoTutor(studentId, tutorId);
+    async execute(studentId: string, tutorId: string): Promise<StudentEntity[] | null> {
+        const students = await this.repository.addStudentToTutor(studentId, tutorId);
 
-        if (!student) {
+        if (!students) {
             signale.error("Failed to add student to tutor");
             return null;
         }
-        return student;
+        return students;
     }
 }
