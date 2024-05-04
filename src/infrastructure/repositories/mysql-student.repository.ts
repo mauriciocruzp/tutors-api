@@ -76,8 +76,7 @@ export class MysqlStudentRepository implements StudentInterface {
             const createdStudent = await StudentModel.create({
                 id: student.id,
                 firstName: student.firstName,
-                lastName: student.lastName,
-                tutorId: ""
+                lastName: student.lastName
             });
             return createdStudent;
         } catch (error) {
@@ -113,7 +112,7 @@ export class MysqlStudentRepository implements StudentInterface {
         }
     }
 
-    async addStudenttoTutor(studentId: string, tutorId: string): Promise<StudentEntity | null> {
+    async addStudentToTutor(studentId: string, tutorId: string): Promise<StudentEntity[] | null> {
         try {
             const student = await StudentModel.findOne({ where: { id: studentId } });
             const tutor = await TutorModel.findOne({ where: { id: tutorId } });
@@ -122,16 +121,18 @@ export class MysqlStudentRepository implements StudentInterface {
                 return null;
             }
 
-            student.tutorId = tutorId;
-            await student.save();
-            return student;
+            await tutor.$add('students', student);
+
+            const tutorStudents = await this.getStudentsFromTutor(tutorId);
+
+            return tutorStudents;
         } catch (error) {
             signale.error(error);
             return null;
         }
     }
 
-    async addSubjecttoStudent(studentId: string, subjectId: string): Promise<SubjectStudentEntity | null> {
+    async addSubjectToStudent(studentId: string, subjectId: string): Promise<SubjectEntity[] | null> {
         try {
             const student = await StudentModel.findOne({ where: { id: studentId } });
             const subject = await SubjectModel.findOne({ where: { id: subjectId } });
@@ -140,14 +141,37 @@ export class MysqlStudentRepository implements StudentInterface {
                 return null;
             }
 
-            const id = uuidv4();
+            await student.$add('subjects', subject);
 
-            const createdSubjectStudent = await SubjectStudentModel.create({
-                id,
-                subjectId,
-                studentId,
-            });
-            return createdSubjectStudent;
+            const subjectStudents = await this.getSubjectsFromStudent(studentId);
+
+            return subjectStudents;
+        } catch (error) {
+            signale.error(error);
+            return null;
+        }
+    }
+
+    async getStudentById(id: string): Promise<StudentEntity | null> {
+        try {
+            const student = await StudentModel.findOne({ where: { id } });
+            if (!student) {
+                return null;
+            }
+            return student;
+        } catch (error) {
+            signale.error(error);
+            return null;
+        }
+    }
+
+    async getTutorById(id: string): Promise<TutorEntity | null> {
+        try {
+            const tutor = await TutorModel.findOne({ where: { id } });
+            if (!tutor) {
+                return null;
+            }
+            return tutor;
         } catch (error) {
             signale.error(error);
             return null;
