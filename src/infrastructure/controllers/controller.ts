@@ -11,7 +11,7 @@ import { GetSubjectsFromStudentUseCase } from "../../application/use-cases/get-s
 import { GetStudentByIdUseCase } from "../../application/use-cases/get-student-by-id.use-case";
 import { GetTutorByIdUseCase } from "../../application/use-cases/get-tutor-by-id.use-case";
 
-export class StudentController {
+export class Controller {
     constructor(readonly getTutorByIdUseCase: GetTutorByIdUseCase, readonly getStudentByIdUseCase: GetStudentByIdUseCase, readonly getStudentsFromTutorUseCase: GetStudentsFromTutorUseCase, readonly getSubjectsFromStudentUseCase: GetSubjectsFromStudentUseCase, readonly addStudentToTutorUseCase: AddStudentToTutorUseCase, readonly addSubjectToStudentUseCase: AddSubjectToStudentUseCase, readonly createSubjectUseCase: CreateSubjectUseCase, readonly createStudentUseCase: CreateStudentUseCase, readonly createTutorUseCase: CreateTutorUseCase, readonly getTutorsUseCase: GetTutorsUseCase, readonly getStudentsUseCase: GetStudentsUseCase) { }
 
     async getTutors(req: Request, res: Response) {

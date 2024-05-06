@@ -5,12 +5,10 @@ import { StudentEntity } from "../../domain/entities/student.entity";
 import { SubjectEntity } from "../../domain/entities/subject.entity";
 import { TutorEntity } from "../../domain/entities/tutor.entity";
 import { StudentInterface } from "../../domain/interfaces/student.interface";
-import { v4 as uuidv4 } from "uuid";
 import signale from "signale";
 import SubjectStudentModel from "../../database/mysql/models/subject-student.model";
-import { SubjectStudentEntity } from "../../domain/entities/subject-student.model";
 
-export class MysqlStudentRepository implements StudentInterface {
+export class MysqlRepository implements StudentInterface {
     async getAllTutors(): Promise<TutorEntity[]> {
         try {
             const tutors = await TutorModel.findAll();
